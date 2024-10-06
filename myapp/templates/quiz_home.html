@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA & Space Quiz</title>
+
+    <!-- Google Font Inspired by NASA's Website -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'monospace', Courier;
+            
+background: radial-gradient(circle at 20% 50%, #150901, #171a0b);
+           
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 5px #879008, 0 0 3px #e9e91198;
+    color: #aeae68;
+}
+            
+        
+        p {
+            font-size: 1.5em;
+            color: #ccc;
+        }
+        
+        #start-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        #start-button {
+            padding: 15px 30px;
+            font-size: 1.5em;
+
+            
+            background-color: #070b0b7e;
+            color: white;
+            font-weight: 800;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.4s ease-in-out, transform 0.4s ease-in-out;
+            box-shadow: 0px 10px 20px rgb(105 90 2 / 50%);
+            letter-spacing: 1px;
+            font-family:'monospace', Courier;
+        }
+        
+        #start-button:hover {
+            background-color: #070b0b7e;
+            transform: translateY(-5px);
+            color: white;
+            font-weight: bolder;
+            box-shadow: 0px 10px 30px rgba(180, 154, 4, 0.5);
+            
+        }
+        #restart-button{
+            background-color: #070b0b44;
+            transform: translateY(-5px);
+            color: white;
+            font-weight: bolder;
+            width: 10em;
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0px 10px 30px rgba(180, 154, 4, 0.5);
+        }
+        
+        #quiz-container {
+            display: none;
+            text-align: center;
+            width: 60%;
+            background: rgb(46 43 43 / 34%);
+
+
+            backdrop-filter: blur(1px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 10px 6px 28px rgb(105 90 2 / 50%);
+            z-index: 2;
+            overflow: hidden;
+        }
+        
+        .question {
+            opacity: 0;
+            transform: translateY(-50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color:aliceblue;
+            letter-spacing: 2px;
+        }
+        
+        .show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .option-button {
+            padding: 15px 20px;
+            margin: 10px 0;
+            font-size: 1.3em;
+            border: none;
+            background-color: #bbd5d396;
+            font-weight:600;
+
+            color: #000;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            display: block;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+        
+        .option-button:hover {
+            background-color: #04040381;
+            box-shadow: 0 0 15px rgba(203, 242, 242, 0.5);
+            transform: scale(1.05);
+            color:whitesmoke
+        }
+        
+        .feedback {
+            display: none;
+            font-size: 1.5em;
+            margin: 10px 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .correct {
+            color: #00ff88;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .incorrect {
+            color: #ff4444;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        #progress-bar {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        #progress {
+            height: 20px;
+            background-color: #d2dfdf;
+            width: 0%;
+            border-radius: 5px;
+        }
+        
+        footer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-align: center;
+            opacity: 0.8;
+            color: #ccc;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        #next-button
+        {
+            background-color: #0fdbb277;
+            border: 1px solid rgba(212, 255, 0, 0.738);
+            border-radius: 10px;
+            padding: 8px;
+            align-items: center;
+font-weight:600;
+cursor:pointer;
+
+        }
+
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+</head>
+
+<body>
+
+    <header id="welcome-header">
+        <h1>NASA & Space Quiz</h1>
+        <p>Test Your Knowledge of Space and NASA Missions!</p>
+        <div id="start-container">
+            <p  display="hidden">Quiz for  <label id="name">{{name}}</label></p>
+            <button id="start-button" onclick="startQuiz()">Start Quiz</button>
+        </div>
+    </header>
+
+    <section id="quiz-container">
+        <div id="question-container">
+            <!-- Questions and Options will be dynamically added here via JavaScript -->
+        </div>
+        <div id="progress-bar">
+            <div id="progress"></div>
+        </div>
+       <center> <button id="next-button" onclick="nextQuestion()" style="display: none;">Next Question</button></center>
+    </section>
+
+    <footer>
+        <p>Explore more at NASA's Website!</p>
+    </footer>
+
+    <script>
+   const quizData = [
+    // Mercury Questions
+    {
+        question: "What is the closest planet to the Sun?",
+        options: ["Mercury", "Venus", "Earth", "Mars"],
+        correct: "Mercury",
+        name: "mercury"
+    },
+    {
+        question: "How many moons does Mercury have?",
+        options: ["0", "1", "2", "3"],
+        correct: "0",
+        name: "mercury"
+    },
+    {
+        question: "Which planet has the shortest orbit around the Sun?",
+        options: ["Mercury", "Venus", "Earth", "Mars"],
+        correct: "Mercury",
+        name: "mercury"
+    },
+    {
+        question: "What is the average surface temperature of Mercury during the day?",
+        options: ["100°C", "430°C", "200°C", "350°C"],
+        correct: "430°C",
+        name: "mercury"
+    },
+    {
+        question: "What is the length of a day on Mercury?",
+        options: ["24 hours", "59 Earth days", "30 Earth days", "1 Earth year"],
+        correct: "59 Earth days",
+        name: "mercury"
+    },
+    {
+        question: "What is Mercury’s atmosphere primarily composed of?",
+        options: ["Oxygen", "Sodium", "Carbon Dioxide", "Nitrogen"],
+        correct: "Sodium",
+        name: "mercury"
+    },
+    {
+        question: "Which spacecraft first visited Mercury?",
+        options: ["Voyager 1", "Mariner 10", "New Horizons", "MESSENGER"],
+        correct: "Mariner 10",
+        name: "mercury"
+    },
+    {
+        question: "What is Mercury's surface mostly covered with?",
+        options: ["Water", "Ice", "Craters", "Sand dunes"],
+        correct: "Craters",
+        name: "mercury"
+    },
+    {
+        question: "How long is one year on Mercury?",
+        options: ["365 days", "88 days", "30 days", "80 days"],
+        correct: "88 days",
+        name: "mercury"
+    },
+    {
+        question: "What unique characteristic does Mercury's orbit have?",
+        options: ["Perfect circular orbit", "Highly elliptical orbit", "3:2 spin-orbit resonance", "Constant speed"],
+        correct: "3:2 spin-orbit resonance",
+        name: "mercury"
+    },
+    
+    // Venus Questions
+    {
+        question: "Which planet is known as the 'Evening Star' or 'Morning Star'?",
+        options: ["Mars", "Jupiter", "Venus", "Saturn"],
+        correct: "Venus",
+        name: "venus"
+    },
+    {
+        question: "What is the primary gas in Venus's atmosphere?",
+        options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+        correct: "Carbon dioxide",
+        name: "venus"
+    },
+    {
+        question: "What is Venus’s surface temperature?",
+        options: ["100°C", "300°C", "465°C", "200°C"],
+        correct: "465°C",
+        name: "venus"
+    },
+    {
+        question: "How long is a day on Venus?",
+        options: ["24 hours", "243 days", "30 days", "100 days"],
+        correct: "243 days",
+        name: "venus"
+    },
+    {
+        question: "What is the length of a year on Venus?",
+        options: ["365 days", "225 days", "120 days", "300 days"],
+        correct: "225 days",
+        name: "venus"
+    },
+    {
+        question: "What makes it hard to observe the surface of Venus?",
+        options: ["Dust storms", "Thick clouds", "Clear skies", "Snow"],
+        correct: "Thick clouds",
+        name: "venus"
+    },
+    {
+        question: "Which spacecraft was the first to land on Venus?",
+        options: ["Pioneer 1", "Venera 7", "Mariner 2", "Magellan"],
+        correct: "Venera 7",
+        name: "venus"
+    },
+    {
+        question: "What geological features are found on Venus?",
+        options: ["Mountains", "Canyons", "Volcanic plains", "Craters"],
+        correct: "Volcanic plains",
+        name: "venus"
+    },
+    {
+        question: "What is the main reason Venus is so hot?",
+        options: ["Proximity to the Sun", "Greenhouse effect", "Thick atmosphere", "Lack of water"],
+        correct: "Greenhouse effect",
+        name: "venus"
+    },
+    {
+        question: "Venus rotates in the opposite direction to most planets. What is this called?",
+        options: ["Normal rotation", "Retrograde rotation", "Irregular rotation", "Circular rotation"],
+        correct: "Retrograde rotation",
+        name: "venus"
+    },
+    
+    // Earth Questions
+    {
+        question: "What is the only planet known to support life?",
+        options: ["Earth", "Mars", "Venus", "Mercury"],
+        correct: "Earth",
+        name: "earth"
+    },
+    {
+        question: "Approximately what percentage of Earth's surface is covered by water?",
+        options: ["50%", "71%", "80%", "65%"],
+        correct: "71%",
+        name: "earth"
+    },
+    {
+        question: "How many continents are on Earth?",
+        options: ["5", "6", "7", "8"],
+        correct: "7",
+        name: "earth"
+    },
+    {
+        question: "What is Earth's atmosphere primarily composed of?",
+        options: ["Nitrogen and oxygen", "Oxygen and carbon dioxide", "Hydrogen and nitrogen", "Helium and oxygen"],
+        correct: "Nitrogen and oxygen",
+        name: "earth"
+    },
+    {
+        question: "What is the average distance from Earth to the Sun?",
+        options: ["93 million miles", "150 million miles", "50 million miles", "200 million miles"],
+        correct: "93 million miles",
+        name: "earth"
+    },
+    {
+        question: "How long does it take Earth to complete one rotation on its axis?",
+        options: ["12 hours", "24 hours", "36 hours", "48 hours"],
+        correct: "24 hours",
+        name: "earth"
+    },
+    {
+        question: "What is the name of the process that helps regulate Earth's temperature?",
+        options: ["The water cycle", "The greenhouse effect", "The carbon cycle", "The nitrogen cycle"],
+        correct: "The greenhouse effect",
+        name: "earth"
+    },
+    {
+        question: "What was the name of the supercontinent that existed over 200 million years ago?",
+        options: ["Gondwana", "Laurasia", "Pangaea", "Atlantis"],
+        correct: "Pangaea",
+        name: "earth"
+    },
+    {
+        question: "What is the name of the layer of the Earth that is solid rock?",
+        options: ["The atmosphere", "The hydrosphere", "The lithosphere", "The biosphere"],
+        correct: "The lithosphere",
+        name: "earth"
+    },
+    {
+        question: "How many time zones does Earth have?",
+        options: ["12", "24", "36", "48"],
+        correct: "24",
+        name: "earth"
+    },
+    
+    // Mars Questions
+    {
+        question: "What is Mars commonly referred to as?",
+        options: ["The Blue Planet", "The Green Planet", "The Red Planet", "The Yellow Planet"],
+        correct: "The Red Planet",
+        name: "mars"
+    },
+    {
+        question: "What is the name of the largest volcano on Mars?",
+        options: ["Mount Everest", "Olympus Mons", "Mauna Kea", "K2"],
+        correct: "Olympus Mons",
+        name: "mars"
+    },
+    {
+        question: "How many moons does Mars have?",
+        options: ["1", "2", "3", "4"],
+        correct: "2",
+        name: "mars"
+    },
+    {
+        question: "What is the average surface temperature of Mars?",
+        options: ["0°C", "-10°C", "-63°C", "-80°C"],
+        correct: "-63°C",
+        name: "mars"
+    },
+    {
+        question: "What is the primary component of Mars's atmosphere?",
+        options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+        correct: "Carbon dioxide",
+        name: "mars"
+    },
+    {
+        question: "What type of terrain is Mars known for?",
+        options: ["Sandy", "Rocky and dry", "Wet", "Icy"],
+        correct: "Rocky and dry",
+        name: "mars"
+    },
+    {
+        question: "Which rover was the first to successfully land on Mars?",
+        options: ["Spirit", "Opportunity", "Viking 1", "Curiosity"],
+        correct: "Viking 1",
+        name: "mars"
+    },
+    {
+        question: "What are the dark markings on Mars called?",
+        options: ["Martian 'dark regions'", "Volcanoes", "Canyons", "Lakes"],
+        correct: "Martian 'dark regions'",
+        name: "mars"
+    },
+    {
+        question: "Mars has a canyon system called?",
+        options: ["Grand Canyon", "Valles Marineris", "Olympus Canyon", "Rheasilvia"],
+        correct: "Valles Marineris",
+        name: "mars"
+    },
+    {
+        question: "Which planet has the tallest volcano in the solar system?",
+        options: ["Mars", "Earth", "Jupiter", "Venus"],
+        correct: "Mars",
+        name: "mars"
+    },
+    
+    // Add more for the other planets and the Sun in the same structure...
+    
+    // Sun Questions
+    {
+        question: "What is the Sun primarily made of?",
+        options: ["Oxygen", "Hydrogen and Helium", "Carbon", "Iron"],
+        correct: "Hydrogen and Helium",
+        name: "sun"
+    },
+    {
+        question: "What is the surface temperature of the Sun?",
+        options: ["5,500°C", "3,000°C", "10,000°C", "7,500°C"],
+        correct: "5,500°C",
+        name: "sun"
+    },
+    {
+        question: "How long does it take light from the Sun to reach Earth?",
+        options: ["5 minutes", "8 minutes", "10 minutes", "12 minutes"],
+        correct: "8 minutes",
+        name: "sun"
+    },
+    {
+        question: "What process powers the Sun?",
+        options: ["Nuclear fission", "Nuclear fusion", "Combustion", "Chemical reactions"],
+        correct: "Nuclear fusion",
+        name: "sun"
+    },
+    {
+        question: "What is the Sun's atmosphere called?",
+        options: ["The troposphere", "The corona", "The stratosphere", "The mesosphere"],
+        correct: "The corona",
+        name: "sun"
+    },
+    {
+        question: "How old is the Sun?",
+        options: ["4.6 billion years", "3.5 billion years", "6.2 billion years", "5.0 billion years"],
+        correct: "4.6 billion years",
+        name: "sun"
+    },
+    {
+        question: "What is the average distance between the Earth and the Sun?",
+        options: ["93 million miles", "100 million miles", "150 million miles", "50 million miles"],
+        correct: "93 million miles",
+        name: "sun"
+    },
+    {
+        question: "What is the Sun's core temperature?",
+        options: ["1 million°C", "15 million°C", "30 million°C", "50 million°C"],
+        correct: "15 million°C",
+        name: "sun"
+    },
+    {
+        question: "What is the largest feature of the Sun’s outer atmosphere visible during a solar eclipse?",
+        options: ["The corona", "Sunspots", "Solar flares", "Prominences"],
+        correct: "The corona",
+        name: "sun"
+    },
+    {
+        question: "What will happen to the Sun in about 5 billion years?",
+        options: ["It will become a supernova", "It will become a red giant", "It will explode", "It will shrink"],
+        correct: "It will become a red giant",
+        name: "sun"
+    },
+    {
+        question: "What is the largest planet in the solar system?",
+        options: ["Saturn", "Jupiter", "Uranus", "Neptune"],
+        correct: "Jupiter",
+        name: "jupiter"
+    },
+    {
+        question: "How many moons does Jupiter have?",
+        options: ["53", "63", "79", "80"],
+        correct: "79",
+        name: "jupiter"
+    },
+    {
+        question: "What is the Great Red Spot on Jupiter?",
+        options: ["A large mountain", "A huge storm", "A volcanic region", "A large crater"],
+        correct: "A huge storm",
+        name: "jupiter"
+    },
+    {
+        question: "What is the primary component of Jupiter's atmosphere?",
+        options: ["Hydrogen", "Oxygen", "Nitrogen", "Carbon dioxide"],
+        correct: "Hydrogen",
+        name: "jupiter"
+    },
+    {
+        question: "How long is a day on Jupiter?",
+        options: ["10 hours", "12 hours", "24 hours", "48 hours"],
+        correct: "10 hours",
+        name: "jupiter"
+    },
+    {
+        question: "How long does it take Jupiter to orbit the Sun?",
+        options: ["5 Earth years", "12 Earth years", "10 Earth years", "15 Earth years"],
+        correct: "12 Earth years",
+        name: "jupiter"
+    },
+    {
+        question: "Which spacecraft first visited Jupiter?",
+        options: ["Voyager 1", "Pioneer 10", "New Horizons", "Cassini"],
+        correct: "Pioneer 10",
+        name: "jupiter"
+    },
+    {
+        question: "What are Jupiter's four largest moons called?",
+        options: ["Io, Europa, Ganymede, Callisto", "Titan, Mimas, Enceladus, Rhea", "Phobos, Deimos, Triton, Charon", "Dione, Tethys, Iapetus, Hyperion"],
+        correct: "Io, Europa, Ganymede, Callisto",
+        name: "jupiter"
+    },
+    {
+        question: "What is Jupiter's core likely made of?",
+        options: ["Iron", "Rock and ice", "Liquid hydrogen", "Gas"],
+        correct: "Rock and ice",
+        name: "jupiter"
+    },
+    {
+        question: "Which spacecraft was the first to orbit Jupiter?",
+        options: ["Galileo", "Juno", "Voyager 1", "New Horizons"],
+        correct: "Galileo",
+        name: "jupiter"
+    },
+
+    // Saturn Questions
+    {
+        question: "What is Saturn best known for?",
+        options: ["Its moons", "Its rings", "Its large size", "Its volcanoes"],
+        correct: "Its rings",
+        name: "saturn"
+    },
+    {
+        question: "How many main rings does Saturn have?",
+        options: ["3", "5", "7", "9"],
+        correct: "7",
+        name: "saturn"
+    },
+    {
+        question: "Which is the largest moon of Saturn?",
+        options: ["Titan", "Enceladus", "Dione", "Rhea"],
+        correct: "Titan",
+        name: "saturn"
+    },
+    {
+        question: "How long is a day on Saturn?",
+        options: ["10 hours", "24 hours", "12 hours", "15 hours"],
+        correct: "10 hours",
+        name: "saturn"
+    },
+    {
+        question: "What is the primary component of Saturn's atmosphere?",
+        options: ["Oxygen", "Helium", "Hydrogen", "Methane"],
+        correct: "Hydrogen",
+        name: "saturn"
+    },
+    {
+        question: "How long does it take Saturn to orbit the Sun?",
+        options: ["12 Earth years", "24 Earth years", "29 Earth years", "50 Earth years"],
+        correct: "29 Earth years",
+        name: "saturn"
+    },
+    {
+        question: "What is Saturn’s largest ring called?",
+        options: ["The E ring", "The B ring", "The C ring", "The A ring"],
+        correct: "The B ring",
+        name: "saturn"
+    },
+    {
+        question: "Which spacecraft first visited Saturn?",
+        options: ["Voyager 2", "Cassini", "Pioneer 11", "New Horizons"],
+        correct: "Pioneer 11",
+        name: "saturn"
+    },
+    {
+        question: "What is the second-largest moon in the solar system, orbiting Saturn?",
+        options: ["Titan", "Io", "Europa", "Ganymede"],
+        correct: "Titan",
+        name: "saturn"
+    },
+    {
+        question: "What phenomenon occurs at Saturn's poles?",
+        options: ["Auroras", "Volcanic eruptions", "Hurricanes", "Polar ice caps"],
+        correct: "Auroras",
+        name: "saturn"
+    },
+
+    // Uranus Questions
+    {
+        question: "Which planet rotates on its side?",
+        options: ["Mars", "Saturn", "Uranus", "Neptune"],
+        correct: "Uranus",
+        name: "uranus"
+    },
+    {
+        question: "What color is Uranus?",
+        options: ["Blue", "Red", "Yellow", "Greenish-blue"],
+        correct: "Greenish-blue",
+        name: "uranus"
+    },
+    {
+        question: "How many moons does Uranus have?",
+        options: ["13", "15", "27", "30"],
+        correct: "27",
+        name: "uranus"
+    },
+    {
+        question: "What is the primary component of Uranus's atmosphere?",
+        options: ["Oxygen", "Carbon dioxide", "Hydrogen", "Methane"],
+        correct: "Methane",
+        name: "uranus"
+    },
+    {
+        question: "How long is a year on Uranus?",
+        options: ["84 Earth years", "12 Earth years", "29 Earth years", "100 Earth years"],
+        correct: "84 Earth years",
+        name: "uranus"
+    },
+    {
+        question: "Which spacecraft first visited Uranus?",
+        options: ["Voyager 2", "Cassini", "Pioneer 11", "New Horizons"],
+        correct: "Voyager 2",
+        name: "uranus"
+    },
+    {
+        question: "What is the coldest planet in the solar system?",
+        options: ["Uranus", "Neptune", "Pluto", "Saturn"],
+        correct: "Uranus",
+        name: "uranus"
+    },
+    {
+        question: "What are Uranus's rings made of?",
+        options: ["Gas", "Rock and ice", "Dust", "Water"],
+        correct: "Rock and ice",
+        name: "uranus"
+    },
+    {
+        question: "How long does it take Uranus to rotate on its axis?",
+        options: ["10 hours", "17 hours", "24 hours", "30 hours"],
+        correct: "17 hours",
+        name: "uranus"
+    },
+    {
+        question: "What is unusual about the tilt of Uranus?",
+        options: ["It is tilted sideways", "It has no tilt", "It has the smallest tilt", "It tilts backward"],
+        correct: "It is tilted sideways",
+        name: "uranus"
+    },
+
+    // Neptune Questions
+    {
+        question: "Which planet is farthest from the Sun?",
+        options: ["Neptune", "Uranus", "Pluto", "Saturn"],
+        correct: "Neptune",
+        name: "neptune"
+    },
+    {
+        question: "How long is a year on Neptune?",
+        options: ["84 Earth years", "165 Earth years", "100 Earth years", "50 Earth years"],
+        correct: "165 Earth years",
+        name: "neptune"
+    },
+    {
+        question: "What is the largest moon of Neptune?",
+        options: ["Triton", "Ganymede", "Titan", "Europa"],
+        correct: "Triton",
+        name: "neptune"
+    },
+    {
+        question: "Which spacecraft first visited Neptune?",
+        options: ["Cassini", "Voyager 2", "New Horizons", "Galileo"],
+        correct: "Voyager 2",
+        name: "neptune"
+    },
+    {
+        question: "What gives Neptune its blue color?",
+        options: ["Methane", "Hydrogen", "Water", "Ammonia"],
+        correct: "Methane",
+        name: "neptune"
+    },
+    {
+        question: "What is the temperature on Neptune?",
+        options: ["-200°C", "-100°C", "-50°C", "-300°C"],
+        correct: "-200°C",
+        name: "neptune"
+    },
+    {
+        question: "How long is a day on Neptune?",
+        options: ["16 hours", "24 hours", "30 hours", "12 hours"],
+        correct: "16 hours",
+        name: "neptune"
+    },
+    {
+        question: "What is Neptune's atmosphere mostly composed of?",
+        options: ["Oxygen", "Helium", "Hydrogen", "Methane"],
+        correct: "Hydrogen",
+        name: "neptune"
+    },
+    {
+        question: "Which planet is known for having supersonic winds?",
+        options: ["Jupiter", "Neptune", "Mars", "Venus"],
+        correct: "Neptune",
+        name: "neptune"
+    },
+    {
+        question: "What is Neptune's most notable storm called?",
+        options: ["Great Dark Spot", "Great Red Spot", "Polar Vortex", "Cyclone of Triton"],
+        correct: "Great Dark Spot",
+        name: "neptune"
+    },
+
+    // Pluto Questions
+    {
+        question: "Pluto was reclassified as a?",
+        options: ["Planet", "Moon", "Dwarf planet", "Star"],
+        correct: "Dwarf planet",
+        name: "pluto"
+    },
+    {
+        question: "What is the largest moon of Pluto?",
+        options: ["Charon", "Hydra", "Nix", "Styx"],
+        correct: "Charon",
+        name: "pluto"
+    },
+    {
+        question: "How long is a day on Pluto?",
+        options: ["6.4 Earth days", "12 Earth days", "24 Earth hours", "48 Earth hours"],
+        correct: "6.4 Earth days",
+        name: "pluto"
+    },
+    {
+        question: "How long does it take Pluto to orbit the Sun?",
+        options: ["248 Earth years", "165 Earth years", "100 Earth years", "84 Earth years"],
+        correct: "248 Earth years",
+        name: "pluto"
+    },
+    {
+        question: "Which spacecraft was the first to visit Pluto?",
+        options: ["New Horizons", "Voyager 2", "Cassini", "Galileo"],
+        correct: "New Horizons",
+        name: "pluto"
+    },
+    {
+        question: "Pluto is part of which region of the solar system?",
+        options: ["The Kuiper Belt", "The Oort Cloud", "The Asteroid Belt", "The Heliopause"],
+        correct: "The Kuiper Belt",
+        name: "pluto"
+    },
+    {
+        question: "What is Pluto primarily made of?",
+        options: ["Rock and ice", "Gas", "Iron", "Water"],
+        correct: "Rock and ice",
+        name: "pluto"
+    },
+    {
+        question: "When was Pluto discovered?",
+        options: ["1930", "1920", "1950", "1960"],
+        correct: "1930",
+        name: "pluto"
+    },
+    {
+        question: "How many moons does Pluto have?",
+        options: ["5", "1", "3", "7"],
+        correct: "5",
+        name: "pluto"
+    },
+    {
+        question: "What is Pluto's atmosphere primarily composed of?",
+        options: ["Nitrogen", "Oxygen", "Methane", "Carbon dioxide"],
+        correct: "Nitrogen",
+        name: "pluto"
+    }
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+let filteredQuestions = [];
+
+
+function startQuiz() {
+    const name = document.getElementById('name').textContent;
+    filteredQuestions = quizData.filter(q => q.name.toLowerCase() === name.toLowerCase());
+    
+    if (filteredQuestions.length === 0) {
+        document.getElementById('quiz-container').innerHTML = '<p>No questions available for this planet.</p>';
+        return;
+    }
+    
+    // Shuffle and select 5 random questions
+    filteredQuestions = getRandomQuestions(filteredQuestions, 5);
+    
+    document.getElementById('welcome-header').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    loadQuestion();
+}
+
+function getRandomQuestions(questions, num) {
+    // Shuffle the questions
+    const shuffled = questions.sort(() => 0.5 - Math.random());
+    // Return the first `num` questions
+    return shuffled.slice(0, num);
+}
+
+function loadQuestion() {
+    const questionContainer = document.getElementById('question-container');
+    questionContainer.innerHTML = '';
+
+    const question = document.createElement('h2');
+    question.innerText = filteredQuestions[currentQuestion].question;
+    question.className = 'question show';
+
+    const options = document.createElement('div');
+    options.className = 'options';
+
+    filteredQuestions[currentQuestion].options.forEach(option => {
+        const button = document.createElement('button');
+        button.innerText = option;
+        button.className = 'option-button';
+        button.onclick = () => checkAnswer(option, button);
+        options.appendChild(button);
+    });
+
+    questionContainer.appendChild(question);
+    questionContainer.appendChild(options);
+    updateProgress();
+
+    setTimeout(() => {
+        question.classList.add('show');
+    }, 10);
+}
+
+function checkAnswer(answer, button) {
+    const correctAnswer = filteredQuestions[currentQuestion].correct;
+    const optionButtons = document.querySelectorAll('.option-button');
+
+    optionButtons.forEach(btn => btn.disabled = true);
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+    if (answer === correctAnswer) {
+        button.classList.add('correct');
+        score++;
+        feedback.innerText = 'Correct!';
+        feedback.classList.add('correct');
+    } else {
+        button.classList.add('incorrect');
+        feedback.innerText = 'Incorrect!';
+        feedback.classList.add('incorrect');
+    }
+
+    document.getElementById('question-container').appendChild(feedback);
+    feedback.style.display = 'block';
+
+    document.getElementById('next-button').style.display = 'block';
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < filteredQuestions.length) {
+        loadQuestion();
+    } else {
+        
+        endQuiz();
+    }
+}
+
+function updateProgress() {
+    const progress = document.getElementById('progress');
+    progress.style.width = `${(currentQuestion / filteredQuestions.length) * 100}%`;
+}
+
+function endQuiz() {
+    document.getElementById('quiz-container').innerHTML = `
+        <h2>Quiz Completed!</h2>
+        <p>Your Score: ${score} / ${filteredQuestions.length}</p>
+        <button id="restart-button" onclick="location.reload()">Restart Quiz</button>
+    `;
+}
+
+
+        // Three.js Scene Setup for a dynamic star field background
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer({
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 10000;
+        const positionArray = new Float32Array(starsCount * 3);
+
+        for (let i = 0; i < starsCount; i++) {
+            positionArray[i * 3] = (Math.random() - 0.5) * 2000;
+            positionArray[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+            positionArray[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+        }
+
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+        const starsMaterial = new THREE.PointsMaterial({
+            color: 0xffffff
+        });
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        camera.position.z = 100;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            stars.rotation.x += 0.0005;
+            stars.rotation.y += 0.0005;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

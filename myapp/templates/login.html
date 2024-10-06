@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Login with 3D Planet</title>
+
+    <!-- Custom Styling -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'monospace';
+            background-color: black;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+        }
+
+        /* Space background with smooth panning and zooming animation */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-image: url('static/images/milky.jpg'); /* Your image path */
+            background-size: cover;
+            background-position: center;
+            animation: panZoomBackground 10s linear infinite;
+        }
+
+        @keyframes panZoomBackground {
+            0% {
+                background-position: 0% 0%;
+                transform: scale(1);
+            }
+
+            25% {
+                background-position: 150% 0%;
+                transform: scale(1.02);
+            }
+
+            50% {
+                background-position: 150% 5%;
+                transform: scale(1);
+            }
+
+            75% {
+                background-position: 0% 5%;
+                transform: scale(0.98);
+            }
+
+            100% {
+                background-position: 0% 0%;
+                transform: scale(1);
+            }
+        }
+
+        /* Professional Navigation Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(20, 20, 30, 0.9);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: right;
+            align-items: center;
+            gap: 30px;
+            flex-grow: 1;
+            padding-right: 100px;
+
+        }
+
+        nav a {
+            color:#00ffff;
+            text-decoration: none;
+            font-family: 'monospace';
+            font-size: 25px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding-bottom: 5px;
+            position: relative;
+        }
+
+        nav a::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: #F0B429;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #F0B429;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            padding-right: 80px;
+        }
+
+        .dropdown a {
+            padding: 10px 20px;
+            border: 2px solid #F0B429;
+            border-radius: 10px;
+            color: #E0E0E0;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(20, 20, 30, 0.9);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 10px;
+            top: 100%;
+            right: 0;
+        }
+
+        .dropdown-content a {
+            color: #E0E0E0;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            position: relative;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #F0B429;
+            color: black;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-container {
+    text-align: center;
+    background: rgba(10, 10, 20, 0.8);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
+    width: 500px;
+    height: 400px; /* Increased height of the container */
+    z-index: 3;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribute content vertically */
+}
+        h1 {
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+            color: #FFD469;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 1.2em;
+            color: #ccc;
+        }
+
+        input,
+        button {
+            width: 100%;
+            box-sizing: border-box;
+            height: 50px; /* Set the height of inputs and button */
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.1em;
+        }
+
+        input {
+            border: 1px solid #F0B429;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #F0B429;
+            margin-bottom: 20px; /* Space between input fields */
+        }
+
+        input:focus {
+            border-color: #F0B429;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            background-color: #F0B429;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Space above the button */
+        }
+
+        button:hover {
+            background-color: #FFD469;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+
+    <!-- 3D Planet Background -->
+    <canvas id="background"></canvas>
+    <div class="background"></div>
+
+    <!-- Professional Navigation Bar -->
+    <nav>
+        <div class="nav-links">
+            <a href="/" class="active">Go Back to Home</a>
+        </div>
+
+        <!-- Dropdown for Login on the extreme right -->
+
+    </nav>
+
+    <!-- Main container -->
+    <div class="container">
+        <div class="login-container">
+            <h1>Login</h1>
+            <form id="login-form" action="/checklogin" method="post">
+                {% csrf_token %}
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required minlength="8">
+
+                <button type="submit">Login</button>
+                <p style="font-weight: 300; color: lightgray;">
+  If not registered <a href="/registerd" style="font-weight: 800; color: yellow;"> Registration</a>
+</p>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,255 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planets Information</title>
+    <style>
+        body {
+            font-family: 'monospace';
+            background: linear-gradient(135deg, #000428, #004e92);
+            margin: 20px;
+            color: #fff;
+            text-align: center;
+        }
+        h1 {
+            color: #80d8ff;
+            font-size: 2.5em;
+        }
+        .planet-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        .planet-card {
+            background: transparent;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s, border 0.3s;
+            cursor: pointer;
+            padding: 20px;
+        }
+        .planet-card:hover {
+            transform: scale(1.1);
+        }
+        .planet-card:hover .planet-name::before {
+            content: "";
+            display: block;
+            width: 150px;
+            height: 6px;
+            background-color: #80d8ff;
+            margin: 0 auto;
+            border-radius: 50px;
+        }
+        .planet-image {
+            border: 5px solid #000;
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+        }
+        .planet-name {
+            font-size: 1.5em;
+            color: #80d8ff;
+            margin-top: 10px;
+        }
+        .modal-background {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal {
+            background: #fff;
+            color: #333;
+            border-radius: 12px;
+            padding: 40px;
+            width: 80%;
+            max-width: 900px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .modal h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #00796b;
+        }
+        .modal p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .modal .important-info {
+            background-color: #e0f7fa;
+            border-left: 5px solid #00796b;
+            padding: 15px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .modal-close {
+            align-self: flex-end;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .moons-list {
+            margin-top: 10px;
+        }
+        .research-links {
+            margin-top: 10px;
+            color: #00796b;
+        }
+        .research-links a {
+            color: #00796b;
+            text-decoration: underline;
+        }
+       .nav-links a {
+    color: yellow; /* Set the link color to yellow */
+    text-decoration: none; /* Remove underline */
+}
+
+.nav-links a:hover {
+    text-decoration: underline; /* Optional: underline on hover */
+}
+
+.nav-links a.active {
+    font-weight: bold; /* Optional: bold for active link */
+}
+    </style>
+</head>
+<body>
+<nav>
+        <div class="nav-links">
+            <a href="/" class="active">Go Back to Home</a>
+        </div>
+
+        <!-- Dropdown for Login on the extreme right -->
+
+    </nav>
+
+    <h1>Planets Information</h1>
+
+    <div class="planet-grid">
+        {% for planet in planets %}
+        <div class="planet-card" onclick="showDetails('{{ planet.id }}')">
+            <img src="{% static planet.image_url %}" alt="{{ planet.name }}" class="planet-image">
+            <div class="planet-name">{{ planet.name }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal for planet details -->
+    <div id="modal-background" class="modal-background">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">X</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const researchLinks = {
+            mercury: {
+                link: "https://link.springer.com/article/10.1007/s11214-019-0631-9",
+                name: "The geology and atmosphere of Mercury",
+                description: "from Space Science Reviews covers Mercury's unique geological features and its thin atmosphere."
+            },
+            venus: {
+                link: "https://link.springer.com/article/10.1007/s11214-018-0527-6",
+                name: "Venus' Atmosphere: From Surface to Thermosphere",
+                description: "provides insights into Venus's atmospheric structure and phenomena."
+            },
+            earth: {
+                link: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2020JD032655",
+                name: "Earth's Atmosphere and Climate Dynamics",
+                description: "from AGU Publications discusses the climate and weather systems of Earth."
+            },
+            mars: {
+                link: "https://link.springer.com/article/10.1007/s11214-018-0526-7",
+                name: "Mars Surface and Atmosphere Evolution",
+                description: "from Space Science Reviews delves into Mars's geological history and current atmospheric conditions."
+            },
+            jupiter: {
+                link: "https://academic.oup.com/astrogeo/article/41/1/1.12/182262",
+                name: "Jupiter's Atmospheric Dynamics",
+                description: "explores the gas giant’s unique atmospheric and magnetic characteristics."
+            },
+            saturn: {
+                link: "https://link.springer.com/article/10.1007/s10686-021-09703-6",
+                name: "Saturn's Rings and Moons",
+                description: "from Experimental Astronomy provides detailed research on Saturn's ring system and its moons."
+            },
+            uranus: {
+                link: "https://link.springer.com/article/10.1007/s11214-020-00704-y",
+                name: "The Atmosphere of Uranus",
+                description: "discusses the gas giant's atmospheric composition and peculiar magnetic field."
+            },
+            neptune: {
+                link: "https://link.springer.com/article/10.1007/s11214-019-0627-5",
+                name: "Neptune's Moons and Atmosphere",
+                description: "dives into Neptune's dynamic atmosphere and its moon Triton."
+            }
+        };
+
+        function showDetails(planetId) {
+            const modal = document.getElementById('modal-background');
+            const modalContent = document.getElementById('modal-content');
+
+            // Fetch more planet details from API
+            fetch(`https://api.le-systeme-solaire.net/rest/bodies/${planetId}`)
+            .then(response => response.json())
+            .then(data => {
+                let moonsInfo = '';
+                if (data.moons && data.moons.length > 0) {
+                    moonsInfo = `<p><strong>Moons (${data.moons.length})</strong></p>`;
+                } else {
+                    moonsInfo = `<p><strong>Moons:</strong> No moons</p>`;
+                }
+
+                // Get the corresponding research link and description
+                const planetName = data.englishName.toLowerCase();
+                const research = researchLinks[planetName] || {};
+                const researchLinkHtml = research.link ? `
+                    <div class="research-links">
+                        <a href="${research.link}" target="_blank">${research.name}</a>: ${research.description}
+                    </div>` : '';
+
+                modalContent.innerHTML = `
+                    <h2>${data.englishName} (${data.name})</h2>
+                    <p><strong>Is a Planet:</strong> ${data.isPlanet ? 'Yes' : 'No'}</p>
+                    <p><strong>Mass:</strong> ${data.mass ? data.mass.massValue + ' x 10^' + data.mass.massExponent + ' kg' : 'N/A'}</p>
+                    <p><strong>Around Planet:</strong> ${data.aroundPlanet ? data.aroundPlanet.planet : 'Not orbiting a planet'}</p>
+                    <div class="important-info">
+                        <p><strong>Additional Information:</strong></p>
+                        ${moonsInfo}
+                    </div>
+                    ${researchLinkHtml}
+                `;
+                modal.style.display = "flex";
+            })
+            .catch(error => {
+                console.error('Error fetching planet data:', error);
+                modalContent.innerHTML = `<p>Error fetching planet details. Please try again later.</p>`;
+                modal.style.display = "flex";
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modal-background').style.display = "none";
+        }
+    </script>
+</body>
+</html>

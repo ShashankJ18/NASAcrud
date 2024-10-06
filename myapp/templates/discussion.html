@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion Forum</title>
+
+    <!-- Bootstrap and Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Font Inspired by NASA's Website -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'monospace';
+            background: radial-gradient(circle, #000000, #001f3f, #001f3f, #001f3f, #001f3f, #001f3f, #001f3f, #000000);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            position: relative;
+            overflow: auto; /* Allow body to scroll */
+        }
+
+        /* Background stars animation */
+        .star {
+            position: absolute;
+            background-color: #ffffff; /* Bright white color for stars */
+            border-radius: 50%;
+            animation: twinkle 1.5s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.8; /* Adjust opacity for twinkling effect */
+            }
+            100% {
+                opacity: 1; /* Full opacity for brightness */
+            }
+        }
+
+        /* Create many stars with random positions and sizes */
+        .star:nth-child(1) { width: 6px; height: 6px; top: 10%; left: 15%; }
+        .star:nth-child(2) { width: 4px; height: 4px; top: 20%; left: 25%; }
+        .star:nth-child(3) { width: 8px; height: 8px; top: 30%; left: 5%; }
+        .star:nth-child(4) { width: 6px; height: 6px; top: 40%; left: 35%; }
+        .star:nth-child(5) { width: 5px; height: 5px; top: 50%; left: 60%; }
+        .star:nth-child(6) { width: 6px; height: 6px; top: 70%; left: 80%; }
+        .star:nth-child(7) { width: 8px; height: 8px; top: 80%; left: 20%; }
+        .star:nth-child(8) { width: 4px; height: 4px; top: 90%; left: 70%; }
+        .star:nth-child(9) { width: 6px; height: 6px; top: 60%; left: 90%; }
+        .star:nth-child(10) { width: 5px; height: 5px; top: 15%; left: 50%; }
+
+        #forum-container {
+            z-index: 2;
+            width: 80%; /* Set width to 80% of the viewport */
+            max-width: 1500px; /* Maximum width for larger screens */
+            position: relative; /* Ensure content is above the background */
+            padding-bottom: 20px; /* Space for footer if needed */
+        }
+
+        h2 {
+            text-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+            color: #F0B429;
+        }
+
+        .bg-dark {
+            background-color: rgba(10, 10, 20, 0.8) !important;
+            box-shadow: 0 0 30px #F0B429;
+        }
+
+        .btn-info {
+            background-color: #F0B429 !important;
+            color: #000 !important;
+            border: #F0B429;
+        }
+
+        .btn-info:hover {
+            background-color: black !important;
+            color: white !important;
+            border: 2px solid #F0B429 !important;
+        }
+
+        .upvote-count {
+            color: #29c8f0; /* Bright green for upvotes */
+            margin-left: 10px; /* Space between button and count */
+            font-weight: bold; /* Bold text */
+        }
+
+        .downvote-count {
+            color: coral; /* Bright red for downvotes */
+            margin-left: 10px; /* Space between button and count */
+            font-weight: bold; /* Bold text */
+        }
+
+        label {
+            color: #F0B429;
+        }
+
+        .reply {
+            margin-left: 20px; /* Indentation for replies */
+            border-left: 2px solid #F0B429; /* Left border to separate replies */
+            padding-left: 15px; /* Space between border and reply content */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Create stars -->
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+
+    <section id="forum-container" class="container mt-5">
+        <h2 class="text-center mb-4">Discussion Forum</h2>
+
+        <!-- Category selection form -->
+       <div class="mb-4">
+
+    <form action="{% url 'discussion' %}" method="GET"> <!-- Ensure this points to the correct URL -->
+        <label for="filtering">Filter</label>
+        <select id="category" name="category" class="form-select mb-3" onchange="this.form.submit()" required>
+            <option value="">Select a category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == selected_category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+
+        <div class="mb-4">
+            <form action="/adddiscussion" method="post">
+                {% csrf_token %}
+                <input type="text" id="forum-title" class="form-control mb-3" placeholder="Title of your message" name="discussion_title" required>
+                <textarea id="forum-content" class="form-control mb-3" rows="4" placeholder="Share your thoughts about NASA or Space!" name="content" required></textarea>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Select Category:</label>
+                    <select id="category" name="category" class="form-select" required>
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="btn btn-info w-100" type="submit">Post</button>
+            </form>
+        </div>
+
+        <div id="forum-messages" class="p-3 bg-dark rounded">
+            {% if selected_category %}
+                <h4 class="text-light">Category: {{ selected_category.name }}</h4>
+            {% endif %}
+
+            {% for message in page_obj %}
+                <div class="d-flex flex-column mb-4 p-3 bg-secondary rounded">
+                    <label>Discussion Title:</label>
+                    <h4 class="text-light">{{ message.discussion_title }}</h4>
+                    <label>Posted By:</label>
+                    <p class="text-light">Posted by: <strong>{{ message.user_id.username }}</strong></p>
+                    <p class="text-light">Posted on: <strong>{{ message.created_at|date:"F j, Y, g:i a" }}</strong></p>
+                    <label>Content:</label>
+                    <p class="text-light">{{ message.content }}</p>
+                    <div class="d-flex align-items-center justify-content-start mt-2">
+                        <form action="{% url 'upvote' message.id %}" method="POST" class="me-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light">
+                                <i class="bi bi-hand-thumbs-up-fill"></i> Upvote
+                            </button>
+                        </form>
+                        <span class="upvote-count">{{ message.upvote }} Upvotes</span>
+                        <form action="{% url 'downvote' message.id %}" method="POST" class="ms-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light">
+                                <i class="bi bi-hand-thumbs-down-fill"></i> Downvote
+                            </button>
+                        </form>
+                        <span class="downvote-count">{{ message.downvote }} Downvotes</span>
+                    </div>
+                </div>
+                <!-- Replies Section -->
+                {% for reply in message.replies.all %}
+                    <div class="reply p-3 bg-dark rounded">
+                        <label>Reply:</label>
+                        <p class="text-light">{{ reply.content }}</p>
+                        <p class="text-light">Posted by: <strong>{{ reply.user_id.username }}</strong></p>
+                    </div>
+                {% endfor %}
+                <form action="/add_reply/{{ message.id }}" method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control mb-3" rows="2" placeholder="Reply..." name="reply_content" required></textarea>
+                    <button class="btn btn-info w-100" type="submit">Reply</button>
+                </form>
+            {% endfor %}
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page=1&category={{ selected_category.id }}">First</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&category={{ selected_category.id }}">Previous</a></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}&category={{ selected_category.id }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&category={{ selected_category.id }}">Next</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&category={{ selected_category.id }}">Last</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS and Bootstrap Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

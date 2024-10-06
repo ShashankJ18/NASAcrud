@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orrery Web App</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: black;
+      overflow: hidden;
+    }
+
+    /* Space background with smooth panning and zooming animation */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('static/images/earth.jpg'); /* Your image path */
+      background-size: cover;
+      background-position: center;
+      animation: panZoomBackground 10s linear infinite;
+    }
+
+    @keyframes panZoomBackground {
+      0% { background-position: 0% 0%; transform: scale(1); }
+      25% { background-position: 150% 0%; transform: scale(1.02); }
+      50% { background-position: 150% 5%; transform: scale(1); }
+      75% { background-position: 0% 5%; transform: scale(0.98); }
+      100% { background-position: 0% 0%; transform: scale(1); }
+    }
+
+    /* Professional Navigation Bar */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: rgba(20, 20, 30, 0.9);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+
+    /* Styling the navigation links */
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      flex-grow: 1;
+    }
+
+    nav a {
+      color: #E0E0E0;
+      text-decoration: none;
+      font-family: 'monospace';
+      font-size: 25px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding-bottom: 5px;
+      position: relative;
+    }
+
+    nav a:hover {
+      color: #F0B429;
+    }
+
+    /* Chatbot container styles */
+    .chat-container {
+      position: fixed;
+      bottom: 20px; /* Position the chat container */
+      right: 20px; /* Position the chat container */
+      width: 300px; /* Set width for the chat container */
+      background-color: #334756; /* Chatbox background */
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(162, 192, 185, 0.1);
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 1s ease-in-out;
+      z-index: 999; /* Make sure it's on top */
+      overflow: hidden; /* Prevent overflow */
+    }
+
+    .chatbox {
+      display: flex;
+      flex-direction: column;
+      height: 400px; /* Set height for the chatbox */
+      overflow: hidden;
+    }
+
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+      max-height: 100%;
+    }
+
+    .messages div {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      width: fit-content;
+    }
+
+    .user-message {
+      background-color: #F0A500;
+      color: #000000;
+      margin-left: auto;
+    }
+
+    .bot-message {
+      background-color: #ffffff;
+      color: #000000;
+      margin-right: auto;
+    }
+
+    .input-container {
+      display: flex;
+    }
+
+    .input-container input {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-right: 10px;
+      transition: box-shadow 0.3s;
+    }
+
+    .input-container button {
+      background-color: #F0A500;
+      border: none;
+      color: #000000;
+      padding: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .input-container button:hover {
+      background-color: #c09204;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+{% if messages %}
+    {% for i in messages %}
+    <script>
+        alert('{{i}}');
+    </script>
+    {% endfor %}
+{% endif %}
+
+  <!-- Milky Way background -->
+  <div class="background"></div>
+
+  <!-- Professional Navigation Bar -->
+  <nav>
+   <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="/planets">Planets</a>
+    <a href="/solar_system">Solar System</a>
+    <a href="/discussion">Discussion Forum</a>
+    <a href="#">ChatBot</a>
+
+    {% if not request.session.logemail %}
+      <script>
+        document.querySelectorAll('.nav-links a[href="#"], .nav-links a[href="/discussion"]').forEach(link => {
+          link.addEventListener('click', function(event) {
+            event.preventDefault();
+            alert('Please login or register to access this content.');
+            window.location.href = "/login";
+          });
+        });
+      </script>
+    {% endif %}
+  </div>
+
+  <!-- Dropdown for Login on the extreme right -->
+  <div class="dropdown">
+    {% if request.session.logemail %}
+      <a href="/logout">Logout</a>
+    {% else %}
+      <a href="/login">Login</a>
+      <div class="dropdown-content">
+        <a href="/registerd">Register</a>
+      </div>
+    {% endif %}
+  </div>
+  </nav>
+
+  <!-- Main container -->
+  <div class="container">
+    <h1>Orrery Web App</h1>
+    <p>Explore the Solar System and Near-Earth Objects</p>
+  </div>
+
+  <!-- Chatbot Container -->
+  <div class="chat-container">
+    <div class="chatbox">
+      <div class="messages">
+        <div class="bot-message">Hello! How can I help you today?</div>
+        {% if response %}
+        <div class="user-message">{{ response }}</div>
+        {% endif %}
+      </div>
+      <form method="POST" class="input-container">
+        {% csrf_token %}
+        <input type="text" name="user_input" placeholder="Ask something about space..." />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

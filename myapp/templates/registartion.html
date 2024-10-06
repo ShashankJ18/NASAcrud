@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Registration</title>
+
+    <!-- Google Font Inspired by NASA's Website -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Professional Navigation Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(20, 20, 30, 0.9);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            z-index: 10; /* Increase z-index for nav */
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: right;
+            align-items: center;
+            gap: 30px;
+            flex-grow: 1;
+            padding-right: 100px;
+        }
+
+        nav a {
+            color: #00ffff;
+            text-decoration: none;
+            font-family: 'monospace';
+            font-size: 25px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding-bottom: 5px;
+            position: relative;
+        }
+
+        nav a::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: #F0B429;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #F0B429;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'monospace';
+            background: black;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden; /* Allow overflow */
+            position: relative;
+        }
+
+        .registration-container {
+            background: rgba(10, 10, 20, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
+            width: 500px;
+            height: 600px; /* Increased height of the container */
+            z-index: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Space out the form elements */
+            margin-top: 100px; /* Adjust this value to create the desired space */
+        }
+
+        h1 {
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+            color: #F0B429;
+        }
+
+        label {
+            margin-top: 10px;
+            display: block;
+            text-align: left;
+            font-size: 1.2em;
+            color: #ccc;
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #F0B429;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+
+        input:focus {
+            border-color: #F0B429;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            background-color: #F0B429;
+            color: #000;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box; /* Ensures button respects container padding */
+        }
+
+        button:hover {
+            background-color: #33ffff;
+        }
+
+        .message {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Lower z-index for canvas */
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+
+    <canvas id="background"></canvas>
+    <nav>
+        <div class="nav-links">
+            <a href="/" class="active">Go Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="registration-container">
+        <h1>Registration</h1>
+        <form id="registration-form" action="/adduserdata" method="post">
+            {% csrf_token %}
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required minlength="4" maxlength="15">
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required minlength="4" maxlength="15">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required minlength="8">
+
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required minlength="8">
+
+            <button type="submit">Register</button>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Three.js Scene Setup for a dynamic star field background
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('background'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create stars in a circular (spherical) distribution
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 10000;
+        const positionArray = new Float32Array(starsCount * 3);
+
+        function sphericalDistribution(radius) {
+            const u = Math.random();
+            const v = Math.random();
+            const theta = 2 * Math.PI * u;
+            const phi = Math.acos(2 * v - 1);
+            const r = radius * Math.cbrt(Math.random());
+
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+
+            return { x, y, z };
+        }
+
+        for (let i = 0; i < starsCount; i++) {
+            const { x, y, z } = sphericalDistribution(1000);
+            positionArray[i * 3] = x;
+            positionArray[i * 3 + 1] = y;
+            positionArray[i * 3 + 2] = z;
+        }
+
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });  // Set size of stars
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Function to create shooting stars
+        function createShootingStar() {
+            const geometry = new THREE.CylinderGeometry(0.1, 0.3, 1, 8); // Create a cylinder for shooting stars
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffcc00, // Color of shooting star
+                emissive: 0xff9900 // Flame effect color
+            });
+
+            const shootingStar = new THREE.Mesh(geometry, material);
+            shootingStar.position.set(Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, -1000); // Random position
+            shootingStar.rotation.z = Math.random() * Math.PI; // Random rotation
+
+            scene.add(shootingStar);
+            return shootingStar;
+        }
+
+        const shootingStars = [];
+
+        function animate() {
+            requestAnimationFrame(animate);
+            stars.rotation.z += 0.0005; // Rotate the stars
+
+            shootingStars.forEach(star => {
+                star.position.x += star.position.x < 1000 ? 5 : -5; // Move shooting stars left/right
+                star.position.y += Math.random() * 2 - 1; // Random up/down movement
+
+                if (star.position.x > 1000 || star.position.x < -1000) {
+                    scene.remove(star); // Remove star if out of bounds
+                }
+            });
+
+            if (Math.random() < 0.02) { // Create a shooting star randomly
+                shootingStars.push(createShootingStar());
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        camera.position.z = 5; // Set camera distance
+        animate();
+
+        // Resize renderer on window resize
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+    </script>
+</body>
+
+</html>
